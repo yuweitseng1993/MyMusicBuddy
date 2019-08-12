@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MyMusicBuddy</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="tab_text_1">Rock</string>
+    <string name="tab_text_2">Classic</string>
+    <string name="tab_text_3">Pop</string>
+    <string name="title_activity_home_screen">home_screen</string>
+</resources>
