@@ -2,12 +2,14 @@ package com.example.mymusicbuddy;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,7 +44,8 @@ public class CustomViewHolder extends RecyclerView.ViewHolder {
         }
         else{
             Log.d(TAG, "onBindViewHolder: no internet");
-            loadImageFromStorage(item.artworkUrl100);
+//            loadImageFromStorage(item.artworkUrl100);
+            iv_track_pic.setImageResource(android.R.drawable.ic_menu_report_image);
         }
 
         itemView.setOnClickListener(new View.OnClickListener() {

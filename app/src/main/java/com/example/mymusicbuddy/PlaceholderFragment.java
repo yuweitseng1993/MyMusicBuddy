@@ -179,25 +179,18 @@ public class PlaceholderFragment extends Fragment implements CustomListener{
         long rowCount;
         if(index.equals("1")){
             rowCount = DatabaseUtils.queryNumEntries(readableDB, DatabaseUtil.TrackTable.rockTableName);
-            if(rowCount > 0){
-                return true;
-            }
-            return false;
         }
         else if(index.equals("2")){
             rowCount = DatabaseUtils.queryNumEntries(readableDB, DatabaseUtil.TrackTable.classicTableName);
-            if(rowCount > 0){
-                return true;
-            }
-            return false;
         }
         else{
             rowCount = DatabaseUtils.queryNumEntries(readableDB, DatabaseUtil.TrackTable.popTableName);
-            if(rowCount > 0){
-                return true;
-            }
+        }
+        Log.d(TAG, "ifTableFilled: rowCount -> " + rowCount);
+        if(rowCount < 50){
             return false;
         }
+        return true;
     }
 
     public ResultPojo loadMusicGenere(String index){
@@ -205,7 +198,7 @@ public class PlaceholderFragment extends Fragment implements CustomListener{
         SQLiteDatabase readableDB = database.getReadableDatabase();
         List<TrackPojo> newSet = new ArrayList<>();
         Cursor cursor;
-        ResultPojo resultPojo = null;
+        ResultPojo resultPojo;
         if(index.equals("1")){
             cursor = readableDB.query(DatabaseUtil.TrackTable.rockTableName, null, null, null, null, null, null, null);
         }
@@ -224,6 +217,7 @@ public class PlaceholderFragment extends Fragment implements CustomListener{
             newSet.add(new TrackPojo(artistName, collectionName, imagePath, null, price, currency));
         }
         resultPojo = new ResultPojo(newSet.size(), newSet);
+        Log.d(TAG, "loadMusicGenere: newSet.size() -> " + newSet.size());
         readableDB.close();
         return resultPojo;
     }
@@ -235,32 +229,39 @@ public class PlaceholderFragment extends Fragment implements CustomListener{
             MusicDatabase database = new MusicDatabase(getContext());
             SQLiteDatabase saveData = database.getWritableDatabase();
             ContentValues values = new ContentValues();
-            for(TrackPojo item : lists[0]){
-                values.put(DatabaseUtil.TrackTable.artistColumn, item.artistName);
-                values.put(DatabaseUtil.TrackTable.collectionColumn, item.collectionName);
-                values.put(DatabaseUtil.TrackTable.priceColumn, item.trackPrice + " " + item.currency);
-                Bitmap imgBitmap;
-                try{
-                    URL url = new URL(item.artworkUrl100);
-                    URLConnection connection = url.openConnection();
-                    connection.setDoInput(true);
-                    InputStream input = connection.getInputStream();
-                    imgBitmap = BitmapFactory.decodeStream(input);
-                } catch(IOException e){
-                    e.printStackTrace();
-                    return null;
-                }
-                ContextWrapper cw = new ContextWrapper(getContext());
-                File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-                File mypath = new File(directory, item.artworkUrl100);
-
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(mypath);
-                    imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            Log.d(TAG, "doInBackground: lists[0] -> " + lists[0]);
+            for(int i = 0; i < (lists[0]).size(); i++){
+//            for(TrackPojo item : lists[0]){
+//                values.put(DatabaseUtil.TrackTable.artistColumn, item.artistName);
+//                values.put(DatabaseUtil.TrackTable.collectionColumn, item.collectionName);
+//                values.put(DatabaseUtil.TrackTable.priceColumn, item.trackPrice + " " + item.currency);
+//                values.put(DatabaseUtil.TrackTable.imageColumn, item.artworkUrl100);
+                values.put(DatabaseUtil.TrackTable.artistColumn, lists[0].get(i).artistName);
+                values.put(DatabaseUtil.TrackTable.collectionColumn, lists[0].get(i).collectionName);
+                values.put(DatabaseUtil.TrackTable.priceColumn, lists[0].get(i).trackPrice + " " + lists[0].get(i).currency);
+                values.put(DatabaseUtil.TrackTable.imageColumn, lists[0].get(i).artworkUrl100);
+//                Bitmap imgBitmap;
+//                try{
+//                    URL url = new URL(item.artworkUrl100);
+//                    URLConnection connection = url.openConnection();
+//                    connection.setDoInput(true);
+//                    InputStream input = connection.getInputStream();
+//                    imgBitmap = BitmapFactory.decodeStream(input);
+//                } catch(IOException e){
+//                    e.printStackTrace();
+//                    return null;
+//                }
+//                ContextWrapper cw = new ContextWrapper(getContext());
+//                File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+//                File mypath = new File(directory, item.artworkUrl100);
+//
+//                FileOutputStream fos = null;
+//                try {
+//                    fos = new FileOutputStream(mypath);
+//                    imgBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
 //                finally {
 //                    try {
 //                        fos.close();
@@ -268,11 +269,40 @@ public class PlaceholderFragment extends Fragment implements CustomListener{
 //                        e.printStackTrace();
 //                    }
 //                }
-                values.put(DatabaseUtil.TrackTable.imageColumn, directory.getAbsolutePath());
+//                values.put(DatabaseUtil.TrackTable.imageColumn, directory.getAbsolutePath());
+                if(tabIndex.equals("1")){
+                    if(saveData.insert(DatabaseUtil.TrackTable.rockTableName, null, values) > 0){
+//                    Toast.makeText(getContext(), "rock track added successfully", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "doInBackground: rock track added successfully");
+                    }
+                    else{
+                        Toast.makeText(getContext(), "ERROR: unable to add rock track to databaase", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else if(tabIndex.equals("2")){
+                    if(saveData.insert(DatabaseUtil.TrackTable.classicTableName, null, values) > 0){
+//                    Toast.makeText(getContext(), "classic track added successfully", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "doInBackground: classic track added successfully");
+                    }
+                    else{
+                        Toast.makeText(getContext(), "ERROR: unable to add classic track to databaase", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else{
+                    if(saveData.insert(DatabaseUtil.TrackTable.popTableName, null, values) > 0){
+//                    Toast.makeText(getContext(), "pop track added successfully", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "doInBackground: pop track added successfully");
+                    }
+                    else{
+                        Toast.makeText(getContext(), "ERROR: unable to add pop track to databaase", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
+//            Log.d(TAG, "doInBackground: tabIndex -> " + tabIndex);
             if(tabIndex.equals("1")){
                 if(saveData.insert(DatabaseUtil.TrackTable.rockTableName, null, values) > 0){
-                    Toast.makeText(getContext(), "rock track added successfully", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "rock track added successfully", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "doInBackground: rock track added successfully");
                 }
                 else{
                     Toast.makeText(getContext(), "ERROR: unable to add rock track to databaase", Toast.LENGTH_SHORT).show();
@@ -280,7 +310,8 @@ public class PlaceholderFragment extends Fragment implements CustomListener{
             }
             else if(tabIndex.equals("2")){
                 if(saveData.insert(DatabaseUtil.TrackTable.classicTableName, null, values) > 0){
-                    Toast.makeText(getContext(), "classic track added successfully", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "classic track added successfully", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "doInBackground: classic track added successfully");
                 }
                 else{
                     Toast.makeText(getContext(), "ERROR: unable to add classic track to databaase", Toast.LENGTH_SHORT).show();
@@ -288,7 +319,8 @@ public class PlaceholderFragment extends Fragment implements CustomListener{
             }
             else{
                 if(saveData.insert(DatabaseUtil.TrackTable.popTableName, null, values) > 0){
-                    Toast.makeText(getContext(), "pop track added successfully", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "pop track added successfully", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "doInBackground: pop track added successfully");
                 }
                 else{
                     Toast.makeText(getContext(), "ERROR: unable to add pop track to databaase", Toast.LENGTH_SHORT).show();

@@ -39,16 +39,19 @@ public class HomeScreen extends AppCompatActivity {
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        internetConnection = isInternetConnected();
+        isInternetConnected();
     }
 
-    public boolean isInternetConnected(){
+    public void isInternetConnected(){
         ConnectivityManager connectivityManager = (ConnectivityManager)(this.getSystemService(Context.CONNECTIVITY_SERVICE));
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        if(activeNetworkInfo != null && activeNetworkInfo.isConnected())
+            internetConnection = true;
+        else
+            internetConnection = false;
     }
 
-    public static boolean getInternetStatus(){
+    public static boolean getInternetStatus(){ ;
         return internetConnection;
     }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyMusicBuddy</string>
+    <string name="app_name">My Music Buddy</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="tab_text_1">Rock</string>
     <string name="tab_text_2">Classic</string>
